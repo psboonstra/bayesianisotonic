@@ -1,16 +1,13 @@
 # Bayesian Isotonic
 
-This repository contains code for the methodology proposed in Boonstra, Owen, and Kang (2021) You can use the scripts in this repository to 
-reproduce the simulations studies in the manuscript. See also `vignette.pdf` 
-for a vignette describing the typical usage of the adaptive Bayesian priors on
-a simulated dataset
+This repository contains code for the methodology proposed in Boonstra, Owen, and Kang (2021). You can use the scripts in this repository to 
+reproduce the simulations studies in the manuscript. See also `vignette.pdf` for a vignette describing the typical usage of the adaptive Bayesian priors on a simulated dataset.
 
 ### Further details
 
 In more detail, there are six files included in this repository (in addition to 
 this README and `vignette.pdf`): one text file (<samp>run_abu_sims.txt</samp>) 
-and five <samp>R</samp> scripts (ending in  <samp>.R</samp>). The simulation
-studies reported in Boonstra and Barbaro were run using commit 22
+and five <samp>R</samp> scripts (ending in  <samp>.R</samp>). 
 
 #### Text file
 <samp>run_abu_sims.txt</samp> is the script for submitting parallel runs of
@@ -23,6 +20,12 @@ The script assumes that you want all of the results to be put in your home
 directory (which you probably don't). Edit the script as needed  
 
 #### <samp>R</samp> files
+
+<samp>fixed_data_evaluation1.r</samp> runs the first fixed-data evaluation in
+Section 3.1 and creates a \latex table
+
+<samp>fixed_data_evaluation2.r</samp> runs the second fixed-data evaluation in
+Section 3.2 and creates Figures 1 and 2
 
 <samp>vignette.R</samp> creates a single simulated dataset and walks through 
 analyzing these data using the various adaptive priors. It can also be `knit` 
