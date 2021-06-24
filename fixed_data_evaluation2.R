@@ -18,7 +18,7 @@ options(warn = 1);
 rstan_options(auto_write = TRUE);
 options(mc.cores = parallel::detectCores());
 
-source("1functions_methods.R");
+source("functions.R");
 
 data_features = 
   tibble(n_cats = c(10, 5, 10), 

@@ -1,50 +1,58 @@
 # Bayesian Isotonic
 
-This repository contains code for the methodology proposed in Boonstra, Owen, and Kang (2021). You can use the scripts in this repository to 
-reproduce the simulations studies in the manuscript. See also `vignette.pdf` for a vignette describing the typical usage of the adaptive Bayesian priors on a simulated dataset.
+This repository contains code for the methodology proposed in Boonstra, Owen, 
+and Kang (2021). You can use the scripts in this repository to 
+reproduce the simulations studies in the manuscript. See also `vignette.pdf` 
+for a vignette describing the typical usage of the adaptive Bayesian priors 
+on a simulated dataset
 
 ### Further details
 
 In more detail, there are six files included in this repository (in addition to 
-this README and `vignette.pdf`): one text file (<samp>run_abu_sims.txt</samp>) 
-and five <samp>R</samp> scripts (ending in  <samp>.R</samp>). 
+this README and `vignette.pdf`): one text file (`varying_data_run_sims.txt`) 
+and five `R` scripts (ending in  `.R`)
 
 #### Text file
-<samp>run_abu_sims.txt</samp> is the script for submitting parallel runs of
-<samp>run_aub_sims.R</samp> (described below) to a cluster that is running
+
+`varying_data_run_sims.txt` is the script for submitting parallel runs of
+`varying_data_run_sims.R` (described below) to a cluster that is running
 SLURM. The following command run in terminal will do this:
 
-<code> sbatch run_abu_sims.txt </code>
+`sbatch varying_data_run_sims.txt`
 
 The script assumes that you want all of the results to be put in your home 
 directory (which you probably don't). Edit the script as needed  
 
-#### <samp>R</samp> files
+#### `R` files
 
-<samp>fixed_data_evaluation1.r</samp> runs the first fixed-data evaluation in
-Section 3.1 and creates a \latex table
+  - `functions.R` provides the R functions that implement the primary
+methodological contribution of the paper. The main function is called
+`bayesian_isotonic` and it can implement both the GAIPV and HSIPV priors from
+the paper, depending on the Stan function provided as the argument
 
-<samp>fixed_data_evaluation2.r</samp> runs the second fixed-data evaluation in
+  - `fixed_data_evaluation1.R` runs the first fixed-data evaluation in
+Section 3.1 and creates Table 1 as LaTeX code
+
+  - `fixed_data_evaluation2.R` runs the second fixed-data evaluation in
 Section 3.2 and creates Figures 1 and 2
 
-<samp>vignette.R</samp> creates a single simulated dataset and walks through 
-analyzing these data using the various adaptive priors. It can also be `knit` 
-to create a copy of `vignette.pdf` (it will take a few minutes to knit)
+  - `varying_data_generate_params.R` constructs inputs for running the 
+varying-data evaluation in Section 3.3. As described in the script's documentation 
+and the language  below, these inputs can be overwritten by the user
 
-<samp>0generate_params.R</samp> constructs inputs for running the simulation
-study. As described in the script's documentation and the language below, these
-inputs can be overwritten by the user
+  - `varying_data_run_sims.R` is the script to conduct the large-scale 
+simulation study described in the manuscript. On a local machine, the user may 
+choose a specific `array_id` (as described in this script's 
+documentation) and run the code locally on their own machine. On a cluster 
+running SLURM, the user can use this script to submit multiple jobs 
+simultaneously (as described  in the description of `varying_data_run_sims.txt` above)
 
-<samp>1run_iso_sims.R</samp> is the script to conduct the large-scale simulation study described in the manuscript. On a local machine, the user may choose a specific <samp>array_id</samp> (as described in this script's documentation) and run the code locally on their own machine. On a cluster running SLURM, the user can use this script to submit multiple jobs simultaneously (as described  in the description of <samp>run_abu_sims.txt</samp> above). 
+  - `varying_data_functions.R` provides the simulation functions. NOTE: 
+this only contains the extra functions needed to simulate the data; the 
+statistical methods are implemented in `functions.R`, described above
 
-<samp>2functions_simulation.R</samp> provides the simulation functions. NOTE: 
-this only contains the extra functions needed to simulate the data; the methods
-are contained in the next file below
-
-<samp>3functions_methods.R</samp> provides the R functions that implement the functions themselves.
-
-<samp>make_figures.R</samp> gives the code to create the figures and tables in 
-the manuscript and supplementary material reporting on the simulation study. 
+  - `make_figures.R` gives the code to create the figures and tables in 
+the manuscript and supplementary material reporting on the simulation study
 
 #### Current Suggested Citation
 
