@@ -28,7 +28,8 @@ directory (which you probably don't). Edit the script as needed
   - `functions.R` provides the R functions that implement the primary
 methodological contribution of the paper. The main function is called
 `bayesian_isotonic` and it can implement both the GAIPV and HSIPV priors from
-the paper, depending on the Stan function provided as the argument
+the paper, depending on the Stan script provided as the value provided
+to the argument `stan_path` (see Stan files section below)
 
   - `fixed_data_evaluation1.R` runs the first fixed-data evaluation in
 Section 3.1 and creates Table 1 as LaTeX code
@@ -53,6 +54,14 @@ statistical methods are implemented in `functions.R`, described above
 
   - `make_figures.R` gives the code to create the figures and tables in 
 the manuscript and supplementary material reporting on the simulation study
+
+#### Stan files
+
+  - `iso_gamma.stan` implements the Gamma isotonic probability vector (GAIPV)
+  prior 
+  
+  - `iso_horseshoe.stan` implements the Horseshoe isotonic probability vector
+  (HSIPV) prior
 
 #### Current Suggested Citation
 

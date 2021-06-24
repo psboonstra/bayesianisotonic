@@ -5,7 +5,7 @@ data {
   int<lower = 0, upper = max(n_per_group_stan)> y_stan[n_groups_stan]; //
   real<lower = 0> local_dof_stan; // dof of pi(lambda), = 1
   real<lower = 0> global_dof_stan; // dof of pi(tau), = 1
-  real<lower = 0> alpha_scale_stan; // c, Section 2 
+  real<lower = 0> alpha_scale_stan; // c, Equation (8)2 
   int<lower = 0,upper = 1> only_prior_stan;//if 1, ignore the model and data and generate from the prior only
 }
 transformed data {
