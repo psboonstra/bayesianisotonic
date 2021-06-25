@@ -42,7 +42,7 @@ for(j in 1:nrow(data_features)) {
   
   hs_scales[[j]] =
     c(horseshoe1 =
-        solve_for_hs_scale1(
+        solve_for_hs_scale(
           target_mean = 0.5 / (curr_n_cats + 1),
           local_dof = 1, 
           global_dof = 1, 

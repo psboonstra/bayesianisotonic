@@ -570,7 +570,7 @@ simulator = function(array_id = 1,
                 local_dof_stan = 1, 
                 global_dof_stan = 1,
                 alpha_scale_stan = 
-                  solve_for_hs_scale1(
+                  solve_for_hs_scale(
                     target_mean = 0.5 / length_unique_x,
                     local_dof = 1, 
                     global_dof = 1, 

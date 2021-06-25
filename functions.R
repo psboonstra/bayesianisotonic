@@ -1,11 +1,23 @@
 
-
-count_stan_divergences = function(stan_fit) {
-  foo = get_sampler_params(stan_fit, inc_warmup = FALSE);
-  n_draws = lapply(foo, nrow)[[1]];
-  sum(unlist(lapply(foo,"[",i = 1:n_draws, j = "divergent__")));
+make_grouped_data <- function(x, y, breaks = NULL) {
+  
+  if(is.null(breaks)) {
+    message("Categorizing 'x' into five groups. Consider choosing your own value.")
+    breaks <- 
+      quantile(x, probs = seq(0, 1, length = 6)) %>%
+      as.numeric() %>%
+      replace(which.min(.), -Inf) %>% 
+      replace(which.max(.), Inf)
+  }
+  
+  tibble(x = cut(x, breaks = breaks, right = F), 
+         y = y) %>%
+    group_by(x) %>%
+    summarize(n = length(x),
+              y = sum(y)) %>%
+    arrange(x) %>%
+    mutate(x_cat = 1:n())   
 }
-
 
 bayesian_isotonic = function(data_grouped = NULL,
                              stan_fit = NA, 
@@ -32,6 +44,7 @@ bayesian_isotonic = function(data_grouped = NULL,
   
   require(tidyverse);require(rstan);
   
+  stopifnot("data.frame" %in% class(data_grouped))
   stopifnot(c("y","n") %in% colnames(data_grouped));
   stopifnot(all(pull(data_grouped,y) >= 0) && 
               all(pull(data_grouped,y) <= pull(data_grouped,n)));
@@ -152,7 +165,15 @@ bayesian_isotonic = function(data_grouped = NULL,
 }
 
 
-solve_for_hs_scale1 = function(target_mean,
+
+count_stan_divergences = function(stan_fit) {
+  foo = get_sampler_params(stan_fit, inc_warmup = FALSE);
+  n_draws = lapply(foo, nrow)[[1]];
+  sum(unlist(lapply(foo,"[",i = 1:n_draws, j = "divergent__")));
+}
+
+
+solve_for_hs_scale = function(target_mean,
                                local_dof = 1,
                                global_dof = 1,
                                slab_precision = 1,
@@ -204,54 +225,4 @@ solve_for_hs_scale1 = function(target_mean,
        diff_from_target = abs(diff_target[i]),
        iter = i);
 }
-
-solve_for_hs_scale2 = function(target_median_alpha,
-                               local_dof = 1,
-                               global_dof = 1,
-                               slab_precision = 1,
-                               tol = .Machine$double.eps^0.95,
-                               max_iter = 100, 
-                               n_sim = 1e6
-) {
-  
-  do_local = (local_dof > 0);
-  do_global = (global_dof > 0);
-  if(do_local) {
-    lambda = rt(n_sim,df = local_dof);
-  } else {
-    lambda = rep(1, n_sim);
-  }
-  if(do_global) {
-    lambda = lambda * rt(n_sim,df = global_dof);
-  } 
-  abs_normal_draws = abs(rnorm(n_sim));
-  stopifnot(target_median_alpha > 0);#Ensure proper bounds
-  log_scale = diff_target = numeric(max_iter);
-  log_scale[1] = log(target_median_alpha);
-  prior_scales = 1 / sqrt(slab_precision + 1/(exp(2*log_scale[1]) * lambda^2));
-  diff_target[1] = median(prior_scales*abs_normal_draws) - target_median_alpha;
-  log_scale[2] = 0.5 + log_scale[1];
-  prior_scales = 1 / sqrt(slab_precision + 1/(exp(2*log_scale[2]) * lambda^2));
-  diff_target[2] = median(prior_scales*abs_normal_draws) - target_median_alpha;
-  i=2;
-  while(T) {
-    i = i+1;
-    if(i > max_iter) {i = i-1; break;}
-    log_scale[i] =
-      log_scale[i-1] - 
-      diff_target[i-1]*(log_scale[i-1]-log_scale[i-2])/(diff_target[i-1]-diff_target[i-2]);
-    prior_scales =
-      1 / sqrt(slab_precision + 1/(exp(2*log_scale[i]) * lambda^2));
-    diff_target[i] = median(prior_scales*abs_normal_draws) - target_median_alpha;
-    if(abs(diff_target[i]-diff_target[i-1]) < tol) {break;}
-  }
-  
-  list(scale = exp(log_scale[i]),
-       achieved_median_alpha = median(prior_scales*abs_normal_draws) ,
-       target_median_alpha = target_median_alpha,
-       diff_from_target = abs(diff_target[i]),
-       iter = i);
-}
-
-
 

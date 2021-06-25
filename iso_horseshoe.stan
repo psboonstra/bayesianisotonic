@@ -27,18 +27,18 @@ transformed parameters {
   vector<lower = 0.0>[n_groups_stan+1] alpha;
   real<lower = 0.0> tau_glob_sq;//tau^2
   vector<lower = 0.0>[n_groups_stan+1] lambda_sq;//lambda^2
-  real<lower = 0.0> sum_alpha;
+  vector<lower = 0.0, upper = 1.0>[n_groups_stan+1] normalized_alpha;
   tau_glob_sq = tau_glob_base_sq * tau_glob_scale_sq;
   lambda_sq = lambda_base_sq .* lambda_scale_sq;
   for(i in 1:(n_groups_stan+1)) {
     theta[i] = 1.0 / sqrt(1.0 + (1.0 / (alpha_scale_stan_sq * tau_glob_sq * lambda_sq[i])));
   }
   alpha = (theta .* alpha_raw);
-  sum_alpha = sum(alpha);
-  xi[1] = alpha[1] / sum_alpha;
+  normalized_alpha = alpha / sum(alpha);
+  xi[1] = normalized_alpha[1];
   if(n_groups_stan > 1) {
     for(i in 2:n_groups_stan) {
-      xi[i] = xi[i-1] + (alpha[i] / sum_alpha);
+      xi[i] = xi[i-1] + normalized_alpha[i];
     }
   }
 }
