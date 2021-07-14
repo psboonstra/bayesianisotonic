@@ -119,8 +119,7 @@ breaks <-
 data_grouped <- 
   make_grouped_data(x, y, breaks)
 
-
-# ++ Fit HSIPV-based model ----
+#+ fit_hsipv, cache = T
 
 #' 
 #' ### HSIPV
@@ -140,7 +139,6 @@ data_grouped <-
 #' $\tilde{m}_\mathrm{eff} / (K+1)$. Here we are targeting $\tilde{m}_\mathrm{eff}=0.5$, 
 #' so `target_mean` = `r 0.5 / (n_breaks+1)`.  
 
-#+ fit_hsipv, cache = T
 
 hs_stan_filenames = "iso_horseshoe.stan"; 
 
@@ -164,7 +162,7 @@ hs_fit =
                     stan_args = hs_stan_args,
                     verbose = T);
 
-# ++ Fit GAIPV-based model ----
+#+ fit_gaipv, cache = T
 
 #'
 #' ### GAIPV
@@ -176,7 +174,6 @@ hs_fit =
 #' `r .Machine$double.eps` as the lower truncation value. These choices correspond
 #' to the **GA$_1$** method that we report in the manuscript. 
 
-#+ fit_gaipv, cache = T
 
 
 ga_stan_filenames = "iso_gamma.stan"
@@ -193,19 +190,28 @@ ga_fit =
 
 #+ plot_results, cache = T
 
-ggplot() + 
-  geom_line(aes(x = data_grouped$x, 
+#' ### Plot results
+#' 
+#' We can plot the fitted models with the following code. In addition to plotting
+#' the interpolated fitted models, we also plot the true probability curve and the
+#' observed prevalence of the outcome in each category of the predictor. The size
+#' of the bubbles correspond to the number of observations in that category. 
+
+ggplot(data = data_grouped) + 
+  geom_line(aes(x = x, 
                 y = colMeans(hs_fit$all_draws$xi),
-                color = "HSIPV")) +
-  geom_line(aes(x = data_grouped$x, 
+                color = "HS")) +
+  geom_line(aes(x = x, 
                 y = colMeans(ga_fit$all_draws$xi),
-                color = "GAIPV")) +
-  geom_point(aes(x = data_grouped$x, 
-                 y = data_grouped$y / data_grouped$n,
-                 color = "Empiric")) +
-  geom_line(aes(x = data_grouped$x, 
-                y = true_prob(data_grouped$x),
-                color = "True")) + 
+                color = "GA1")) +
+  geom_point(aes(x = x, 
+                 y = y / n,
+                 size = n,
+                 color = "Observed prevalences")) +
+  geom_line(aes(x = x, 
+                y = true_prob(x),
+                color = "True probability")) + 
+  scale_color_brewer(palette = "Dark2") + 
   coord_cartesian(ylim = c(0, 1)) + 
   labs(x = "x", y = "Pr(Y=1|x)", color = "Method") + 
   theme(text = element_text(size = 14))

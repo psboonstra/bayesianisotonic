@@ -46,7 +46,7 @@ options(mc.cores = parallel::detectCores());
 # Each job conducts two independent iterations ('nsim=2'), hence 200 iterations
 # per scenario. 
 
-jobs_per_scenario = ifelse(my_computer, 1, 100);
+jobs_per_scenario = 100;
 # Should the sim_id labels be randomly permuted across array_ids?
 permute_array_ids = ifelse(my_computer, F, T);
 

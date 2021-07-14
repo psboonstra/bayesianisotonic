@@ -4,7 +4,7 @@
 # process the results (the files must be in the same place that they were
 # written to, namely the local folder called 'out'). The last call in the 
 # script generates Figures 1 and 2 in the manuscript
-run_sims = T;
+run_sims = F;
 
 library(rstan);
 library(tidyverse);

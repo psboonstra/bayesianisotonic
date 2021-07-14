@@ -52,8 +52,11 @@ simultaneously (as described  in the description of `varying_data_run_sims.txt` 
 this only contains the extra functions needed to simulate the data; the 
 statistical methods are implemented in `functions.R`, described above
 
-  - `make_figures.R` gives the code to create the figures and tables in 
+  - `process_varying_data_sims.R` gives the code to create the figures and tables in 
 the manuscript and supplementary material reporting on the simulation study
+
+  - `vignette.R` provides the R code for running the vignette yourself. 
+
 
 #### Stan files
 
