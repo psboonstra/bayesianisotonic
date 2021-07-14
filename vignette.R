@@ -119,7 +119,6 @@ breaks <-
 data_grouped <- 
   make_grouped_data(x, y, breaks)
 
-#+ fit_hsipv, cache = T
 
 #' 
 #' ### HSIPV
@@ -139,6 +138,7 @@ data_grouped <-
 #' $\tilde{m}_\mathrm{eff} / (K+1)$. Here we are targeting $\tilde{m}_\mathrm{eff}=0.5$, 
 #' so `target_mean` = `r 0.5 / (n_breaks+1)`.  
 
+#+ fit_hsipv, cache = T
 
 hs_stan_filenames = "iso_horseshoe.stan"; 
 
@@ -162,8 +162,6 @@ hs_fit =
                     stan_args = hs_stan_args,
                     verbose = T);
 
-#+ fit_gaipv, cache = T
-
 #'
 #' ### GAIPV
 #' 
@@ -171,24 +169,32 @@ hs_fit =
 #' `iso_gamma_stan` expects are the shape parameter and the lower truncation
 #' of the distribution to prevent underflow. We use $0.5 / (K+1)=`r 0.5 / (n_breaks + 1)`$
 #' as the shape parameter, corresponding to 0.5 effective prior observations, and
-#' `r .Machine$double.eps` as the lower truncation value. These choices correspond
-#' to the **GA$_1$** method that we report in the manuscript. 
+#' `r .Machine$double.eps` as the lower truncation value. These choices respectively 
+#' correspond to the **GA$_1$** and **GA$_4$** methods that we report in the manuscript. 
 
 
+#+ fit_gaipv, cache = T
 
 ga_stan_filenames = "iso_gamma.stan"
 
 ga_stan_args = 
-  list(alpha_shape_stan = 0.5 / (n_breaks + 1), 
-       tiny_positive_stan = .Machine$double.eps)
+  list(
+    list(alpha_shape_stan = 0.5 / (n_breaks + 1), 
+         tiny_positive_stan = .Machine$double.eps),
+    list(alpha_shape_stan = 0.5 / (n_breaks + 1), 
+         tiny_positive_stan = 0))
 
-ga_fit = 
+ga1_fit = 
   bayesian_isotonic(data_grouped = data_grouped,
                     stan_path = ga_stan_filenames, 
-                    stan_args = ga_stan_args,
+                    stan_args = ga_stan_args[[1]],
                     verbose = T);
 
-#+ plot_results, cache = T
+ga4_fit = 
+  bayesian_isotonic(data_grouped = data_grouped,
+                    stan_path = ga_stan_filenames, 
+                    stan_args = ga_stan_args[[2]],
+                    verbose = T);
 
 #' ### Plot results
 #' 
@@ -197,22 +203,53 @@ ga_fit =
 #' observed prevalence of the outcome in each category of the predictor. The size
 #' of the bubbles correspond to the number of observations in that category. 
 
+#+ plot_results, cache = T
+
 ggplot(data = data_grouped) + 
   geom_line(aes(x = x, 
                 y = colMeans(hs_fit$all_draws$xi),
                 color = "HS")) +
   geom_line(aes(x = x, 
-                y = colMeans(ga_fit$all_draws$xi),
+                y = colMeans(ga1_fit$all_draws$xi),
                 color = "GA1")) +
+  geom_line(aes(x = x, 
+                y = colMeans(ga4_fit$all_draws$xi),
+                color = "GA4")) +
   geom_point(aes(x = x, 
                  y = y / n,
                  size = n,
                  color = "Observed prevalences")) +
   geom_line(aes(x = x, 
                 y = true_prob(x),
-                color = "True probability")) + 
+                color = "True probability"), 
+            linetype = 2) + 
   scale_color_brewer(palette = "Dark2") + 
+  scale_size_continuous(range = c(2,5),
+                        breaks = seq(min(data_grouped$n), 
+                                     max(data_grouped$n),
+                                     by = 3)) +
+  guides(color = guide_legend(override.aes = 
+                                list(shape = c(NA, NA, NA, 16, NA),
+                                     linetype = c(1, 1, 1, 0, 2))), 
+         size = guide_legend(override.aes = 
+                               list(color = RColorBrewer::brewer.pal(5, "Dark2")[4]))) + 
   coord_cartesian(ylim = c(0, 1)) + 
   labs(x = "x", y = "Pr(Y=1|x)", color = "Method") + 
   theme(text = element_text(size = 14))
+
+#' The `bayesian_isotonic()` function returns other results. Below we can see that
+#' the horseshoe prior runs faster and with fewer divergences than the gamma-based
+#' prior. 
+
+#+ other_results, cache = T, delay = T
+
+names(hs_fit)
+hs_fit$number_divergences
+hs_fit$total_run_time_secs
+
+names(ga4_fit)
+ga4_fit$number_divergences
+ga4_fit$total_run_time_secs
+
+
 

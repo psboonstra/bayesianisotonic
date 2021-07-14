@@ -8,9 +8,9 @@ on a simulated dataset
 
 ### Further details
 
-In more detail, there are six files included in this repository (in addition to 
-this README and `vignette.pdf`): one text file (`varying_data_run_sims.txt`) 
-and five `R` scripts (ending in  `.R`)
+In more detail, there are 11 files included in this repository (in addition to 
+this README and `vignette.pdf`): one text file (`varying_data_run_sims.txt`), 
+eight R scripts (ending in  `.R`), and two stan files (ending in `.stan`)
 
 #### Text file
 
